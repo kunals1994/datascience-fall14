@@ -263,7 +263,7 @@ SELECT 262
 
 === 11
 select countries.name, count(case when extract(year from players.birthdate) = 1975 then 1 end) 
-from countries left outer join players on countries.country_id = players.country_id
+from countries inner join players on countries.country_id = players.country_id
 group by countries.name;
 **************** RESULT ***************************************************************
                    name                   | count 

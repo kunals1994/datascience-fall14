@@ -1,13 +1,7 @@
 SQL Assignment Submission
 
 === 1
-with event_ids as (
-select event_id
-from events
-where name='110m Hurdles Men')
-select players.name,result             
-from results,event_ids,players
-where results.event_id = event_ids.event_id and players.player_id = results.player_id;
+<INSERT YOUR QUERY HERE>
 **************** RESULT ***************************************************************
 <INSERT YOUR RESULT HERE>
 =============================================================================================
