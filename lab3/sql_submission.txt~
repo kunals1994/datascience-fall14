@@ -1,21 +1,86 @@
 SQL Assignment Submission
 
 === 1
-<INSERT YOUR QUERY HERE>
+create view NumberOfMedals as
+select countries.name,count(results.result) as num_medals
+from countries,players,results
+where results.player_id = players.player_id
+and players.country_id = countries.country_id
+group by countries.name;
 **************** RESULT ***************************************************************
-<INSERT YOUR RESULT HERE>
+CREATE VIEW
 =============================================================================================
 
 === 2
-<INSERT YOUR QUERY HERE>
+a)
+select a,b,R.c,d
+from R 
+inner join S on R.C = S.C or (R.C is null and S.C is null);
+
+b)
+with r2 as (select NULL as a,NULL as b,NULL as c union select * from R),
+s2 as (select NULL as c,NULL as d union select * from s)
+select a,b,r2.c,d
+from r2
+inner join s2 on (r2.C = s2.C or (r2.C is null and s2.C is null)) and (a is not null or b is not null or r2.c is not null or d is not null) ;
+
+
 **************** RESULT ***************************************************************
-<INSERT YOUR RESULT HERE>
+a)
+     a      | b  | c  |     d      
+------------+----+----+------------
+ a3         | 30 | 30 | d1        
+ a4         |  0 |    | d2        
+(2 rows)
+
+b)
+     a      | b  | c  |     d      
+------------+----+----+------------
+            |    |    | d2        
+ a3         | 30 | 30 | d1        
+ a4         |  0 |    | 
+ a4         |  0 |    | d2        
+(4 rows)
+
 =============================================================================================
 
 === 3
-<INSERT YOUR QUERY HERE>
+create or replace function insert_teammedals()
+returns trigger as 
+$BODY$
+declare
+c_id varchar(7);
+is_team integer;
+begin
+select players.country_id
+from players
+where players.player_id = new.player_id
+into c_id;
+select events.is_team_event
+from events
+where events.event_id = new.event_id
+into is_team;
+if is_team = 1 then
+insert into teammedals(country_id,event_id,medal,result)
+values(c_id,new.event_id,new.medal,new.result);
+end if;
+return new;
+end;
+$BODY$
+language 'plpgsql' immutable
+security definer
+cost 10;
+create trigger update_teammedals
+after insert
+on results
+execute procedure insert_teammedals();
 **************** RESULT ***************************************************************
-<INSERT YOUR RESULT HERE>
+OUTPUT: 
+CREATE FUNCTION
+CREATE TRIGGER
+
+
+After inserting the tuple ("E89","GREENMAU01","GOLD",1000000.0) into results, the row USA E89 GOLD 1000000.0 appears in teammedals
 =============================================================================================
 
 === 4
