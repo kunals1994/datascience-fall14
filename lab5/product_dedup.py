@@ -68,9 +68,8 @@ def price_comparator(field_1, field_2) :
             if(f2_rep):
                 f2_price /= 100
 
-            if(f1_price == f2_price):
+            if(f1_price == f2_price and (f1_price != 0)):
                 return 1
-
             else:
                 return 0
     else :
@@ -122,7 +121,7 @@ def title_comparator(field_1, field_2) :
             if word in field_1:
                 f2_f1 += 1
 
-        return (100 * f1_f2 * f2_f1) / (len(field_1) * len(field_2))
+        return 100 * ((f1_f2 * f2_f1) / (len(field_1) * len(field_2)))
 
     else :
         return nan
