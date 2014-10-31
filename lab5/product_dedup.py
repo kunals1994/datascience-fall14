@@ -50,8 +50,8 @@ def price_comparator(field_1, field_2) :
         f1_price = [float(s) for s in field_1.split() if s.isdigit()]
         f2_price = [float(s) for s in field_2.split() if s.isdigit()]
 
-        f1_currency = field_1.replace(f1_price, '')
-        f2_currency = field_2.replace(f2_price, '')
+        f1_currency = field_1.replace(str(f1_price), '')
+        f2_currency = field_2.replace(str(f2_price), '')
 
         if (f1_price == f2_price and f1_currency == f2_currency):
             return 1
