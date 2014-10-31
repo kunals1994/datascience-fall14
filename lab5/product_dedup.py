@@ -165,7 +165,7 @@ def readData(filename):
                     man = row.items()[key]
 
             for key in row.items():
-                if key == "title"
+                if key == "title":
                     for word in man.split():
                         row.items()[key].replace(word, "")
 
