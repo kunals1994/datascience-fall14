@@ -105,7 +105,28 @@ def lev_comparator(field_1, field_2):
 
 def title_comparator(field_1, field_2) :
     if field_1 and field_2 :
-        lev_comparator(field_1, field_2)
+        field_1 = field_1.split()
+        field_2 = field_2.split()
+
+        f1_f2 = 0
+        f2_f1 = 0
+
+        for word in field_1:
+            if word in field_2:
+                f1_f2 += 1
+
+        for word in field_2:
+            if word in field_1:
+                f2_f1 += 1
+
+        f1_f2 /= len(field_1)
+        f2_f1 /= len(field_2)
+
+        f1_f2 *= 100
+        f2_f1 *= 100
+
+        return (f1_f2 + f2_f1)/2
+
     else :
         return nan
 
