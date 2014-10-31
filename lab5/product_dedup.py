@@ -105,6 +105,9 @@ def lev_comparator(field_1, field_2):
 
 def title_comparator(field_1, field_2) :
     if field_1 and field_2 :
+        if (field_1 == field_2 or field_1 in field_2 or field_2 in field_1):
+            return 100
+
         field_1 = field_1.split()
         field_2 = field_2.split()
 
