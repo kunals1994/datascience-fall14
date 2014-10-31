@@ -86,7 +86,7 @@ def lev_comparator(field_1, field_2):
             curr_el.append(min(ins, de, su))
         prev = curr_el
 
-    return prev[-1]/len(s1)
+    return prev[-1]/len(field_1)
 
 def title_comparator(field_1, field_2) :
     if field_1 and field_2 :
