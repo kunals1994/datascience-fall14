@@ -246,7 +246,7 @@ print 'blocking...'
 # If we had more data, we would not pass in all the blocked data into
 # this function but a representative sample.
 
-threshold = deduper.threshold(data_d, recall_weight=1)
+threshold = deduper.threshold(data_d, recall_weight=10)
 
 # `match` will return sets of record IDs that dedupe
 # believes are all referring to the same entity.
