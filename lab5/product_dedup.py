@@ -159,6 +159,16 @@ def readData(filename):
     with open(filename) as f:
         reader = csv.DictReader(f)
         for row in reader:
+            man = ""
+            for key in row.items():
+                if key == "manufacturer":
+                    man = row.items()[key]
+
+            for key in row.items():
+                if key == "title"
+                    for word in man.split():
+                        row.items()[key].replace(word, "")
+
             clean_row = [(k, preProcess(v)) for (k, v) in row.items()]
             row_id = row['id']
             data_d[row_id] = dict(clean_row)
