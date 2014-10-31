@@ -60,9 +60,9 @@ def lev_comparator(field_1, field_2):
         return 0
 
     if (len (field_1) < len(field_2)):
-        return lev_comparator(field_2, field_1)
+        return (-1) * lev_comparator(field_2, field_1)
 
-    if( len(field_2) == 0):
+    if(len(field_2) == 0):
         return len(field_1)
 
     prev = range(len(field_2) + 1)
