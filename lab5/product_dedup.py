@@ -44,10 +44,10 @@ training_file = 'products_training.json'
 
 def price_comparator(field_1, field_2) :
     if field_1 and field_2 :
-        if field_1 == field_2:
+        if (field_1 == field_2 or (field_1 in field_2 or field_2 in field_1)):
             return 1
         else:
-            return 0
+            return lev_comparator(field_1, field_2)
     else :
         return nan
 
@@ -76,6 +76,7 @@ def lev_comparator(field_1, field_2):
             curr_el.append(min(ins, de, su))
         prev = curr_el
 
+    print float(prev[-1])/float(len(field_1))
     return float(prev[-1])/float(len(field_1))
 
 def title_comparator(field_1, field_2) :
@@ -86,7 +87,10 @@ def title_comparator(field_1, field_2) :
 
 def manufacturer_comparator(field_1, field_2) :
     if field_1 and field_2 :
-        lev_comparator(field_1, field_2)
+        if(field_1 == field_2 or (field_1 in field_2 or field_2 in field_1)):
+            return 1
+        else:
+            return 0
     else :
         return nan
 
@@ -190,7 +194,7 @@ print 'blocking...'
 # If we had more data, we would not pass in all the blocked data into
 # this function but a representative sample.
 
-threshold = deduper.threshold(data_d, recall_weight=1000)
+threshold = deduper.threshold(data_d, recall_weight=1)
 
 # `match` will return sets of record IDs that dedupe
 # believes are all referring to the same entity.
