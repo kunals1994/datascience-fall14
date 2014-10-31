@@ -44,28 +44,59 @@ training_file = 'products_training.json'
 
 def price_comparator(field_1, field_2) :
     if field_1 and field_2 :
-        if field_1 == field_2 :
+        field_1 = field_1.replace(".", "")
+        field_2 = field_2.replace(".", "")
+
+        f1_price = [float(s) for s in field_1.split() if s.isdigit()]
+        f2_price = [float(s) for s in field_2.split() if s.isdigit()]
+
+        f1_currency = field_1.replace(f1_price, '')
+        f2_currency = field_2.replace(f2_price, '')
+
+        if (f1_price == f2_price && f1_currency == f2_currency):
             return 1
+        elif ((f1_price > f2_price and f1_price * 0.8 < f2_price) or (f2_price > f1_price and f2_price * 0.8 < f1_price)):
+            return 3
+        elif (f1_price == f2_price):
+            return 2
         else:
             return 0
     else :
         return nan
 
+#Levenshtein distance implementation.
+#Comparator used for title and manufacturer fields
+#Implementation of algorithm found at http://en.wikipedia.org/wiki/Levenshtein_distanc
+#Returns ratio of distance to length of larger field to account for differences in lengths
+def lev_comparator(field_1, field_2):
+    if (len (field_1) < len(field_2)):
+        return lev_comparator(field_2, field_1)
+
+    if( len(field_2) == 0):
+        return len(field_1)
+
+    prev = range(len(field_2) + 1)
+
+    for index, curr in enumerate (field_1):
+        curr_el = [i + 1]
+        for ind, curr2 in enumerate(field_2):
+            ins = prev[ind + 1] + 1
+            de = curr_el[ind] + 1
+            su = prev[ind] + (curr != curr2)
+            curr_el.append(min(ins, de, su))
+        prev = curr_el
+
+    return prev[-1]/len(s1)
+
 def title_comparator(field_1, field_2) :
     if field_1 and field_2 :
-        if field_1 == field_2 :
-            return 1
-        else:
-            return 0
+        lev_comparator(field_1, field_2)
     else :
         return nan
 
 def manufacturer_comparator(field_1, field_2) :
     if field_1 and field_2 :
-        if field_1 == field_2 :
-            return 1
-        else:
-            return 0
+        lev_comparator(field_1, field_2)
     else :
         return nan
 
