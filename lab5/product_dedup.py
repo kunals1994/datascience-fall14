@@ -44,21 +44,8 @@ training_file = 'products_training.json'
 
 def price_comparator(field_1, field_2) :
     if field_1 and field_2 :
-        field_1 = field_1.replace(".", "").replace(",", "")
-        field_2 = field_2.replace(".", "").replace(",", "")
-
-        f1_price = [float(s) for s in field_1.split() if s.isdigit()][0]
-        f2_price = [float(s) for s in field_2.split() if s.isdigit()][0]
-
-        f1_currency = field_1.replace(str(f1_price), '')
-        f2_currency = field_2.replace(str(f2_price), '')
-
-        if (f1_price == f2_price and f1_currency == f2_currency):
+        if field_1 == field_2:
             return 1
-        elif ((f1_price > f2_price and f1_price * 0.8 < f2_price) or (f2_price > f1_price and f2_price * 0.8 < f1_price)):
-            return 3
-        elif (f1_price == f2_price):
-            return 2
         else:
             return 0
     else :
