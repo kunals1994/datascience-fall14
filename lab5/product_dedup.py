@@ -47,7 +47,32 @@ def price_comparator(field_1, field_2) :
         if (field_1 == field_2 or (field_1 in field_2 or field_2 in field_1)):
             return 1
         else:
-            return lev_comparator(field_1, field_2)
+            f1_rep = False
+            f2_rep = False
+
+            if("." in field_1):
+                f1_rep = True
+
+            if("." in field_2):
+                f2_rep = True
+
+            field_1 = field_1.replace(".", "")
+            field_2 = field_2.replace(".", "")
+
+            f1_price = [int(s) for s in field_1.split() if s.isdigit()][0]
+            f2_price = [int(s) for s in field_2.split() if s.isdigit()][0]
+
+            if(f1_rep):
+                f1_price /= 100
+            
+            if(f2_rep):
+                f2_price /= 100
+
+            if(f1_price == f2_price):
+                return 1
+
+            else:
+                return 0
     else :
         return nan
 
@@ -76,8 +101,7 @@ def lev_comparator(field_1, field_2):
             curr_el.append(min(ins, de, su))
         prev = curr_el
 
-    print float(prev[-1])/float(len(field_1))
-    return float(prev[-1])/float(len(field_1))
+    return prev[-1]
 
 def title_comparator(field_1, field_2) :
     if field_1 and field_2 :
