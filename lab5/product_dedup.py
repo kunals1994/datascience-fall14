@@ -119,8 +119,8 @@ def title_comparator(field_1, field_2) :
             if word in field_1:
                 f2_f1 += 1
 
-        f1_f2 /= len(field_1)
-        f2_f1 /= len(field_2)
+        f1_f2 /= len(field_2)
+        f2_f1 /= len(field_1)
 
         f1_f2 *= 100
         f2_f1 *= 100
