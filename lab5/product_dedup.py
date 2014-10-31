@@ -53,7 +53,7 @@ def price_comparator(field_1, field_2) :
         f1_currency = field_1.replace(f1_price, '')
         f2_currency = field_2.replace(f2_price, '')
 
-        if (f1_price == f2_price && f1_currency == f2_currency):
+        if (f1_price == f2_price and f1_currency == f2_currency):
             return 1
         elif ((f1_price > f2_price and f1_price * 0.8 < f2_price) or (f2_price > f1_price and f2_price * 0.8 < f1_price)):
             return 3
