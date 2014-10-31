@@ -69,6 +69,9 @@ def price_comparator(field_1, field_2) :
 #Implementation of algorithm found at http://en.wikipedia.org/wiki/Levenshtein_distanc
 #Returns ratio of distance to length of larger field to account for differences in lengths
 def lev_comparator(field_1, field_2):
+    if (field_1 == field_2 or field_1 in field_2 or field_2 in field_1):
+        return 0
+
     if (len (field_1) < len(field_2)):
         return lev_comparator(field_2, field_1)
 
@@ -86,7 +89,7 @@ def lev_comparator(field_1, field_2):
             curr_el.append(min(ins, de, su))
         prev = curr_el
 
-    return prev[-1]/len(field_1)
+    return float(prev[-1])/float(len(field_1))
 
 def title_comparator(field_1, field_2) :
     if field_1 and field_2 :
