@@ -78,7 +78,7 @@ def lev_comparator(field_1, field_2):
     prev = range(len(field_2) + 1)
 
     for index, curr in enumerate (field_1):
-        curr_el = [i + 1]
+        curr_el = [index + 1]
         for ind, curr2 in enumerate(field_2):
             ins = prev[ind + 1] + 1
             de = curr_el[ind] + 1
