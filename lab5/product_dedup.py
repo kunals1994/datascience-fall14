@@ -167,7 +167,7 @@ def readData(filename):
             for key in row.items():
                 if key == "title":
                     for word in man.split():
-                        row.items()[key].replace(word, "")
+                        row.items()[key] = row.items()[key].replace(word, "")
 
             clean_row = [(k, preProcess(v)) for (k, v) in row.items()]
             row_id = row['id']
