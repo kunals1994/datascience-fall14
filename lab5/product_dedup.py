@@ -121,7 +121,12 @@ def title_comparator(field_1, field_2) :
             if word in field_1:
                 f2_f1 += 1
 
-        return 100 * ((f1_f2 * f2_f1) / (len(field_1) * len(field_2)))
+        ret = 100 * ((f1_f2 * f2_f1) / (len(field_1) * len(field_2)))
+
+        if(ret > 70):
+            return 1
+        else:
+            return 0
 
     else :
         return nan
