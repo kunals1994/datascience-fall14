@@ -110,6 +110,12 @@ def title_comparator(field_1, field_2) :
         field_1 = field_1.split()
         field_2 = field_2.split()
 
+        if(len(field_1) < 2 and len(field_2) > 2):
+            return 0
+
+        if(len(field_2) < 2 and len(field_1) > 2):
+            return 0
+
         f1_f2 = 0
         f2_f1 = 0
 
