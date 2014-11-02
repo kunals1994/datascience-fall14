@@ -172,7 +172,7 @@ else:
     # Here you will need to define the fields dedupe will pay attention to. You also need to define the comparator
     # to be used and specify any customComparators. Please read the dedupe manual for details
     fields = [
-        {'field' : 'title', 'type': 'string', 'has missing':True},
+        {'field' : 'title', 'type': 'String', 'has missing':True},
         {'field' : 'price', 'type': 'Custom', 'has missing':True, 'comparator' : price_comparator},
         {'field' : 'manufacturer', 'type': 'Custom', 'has missing':True, 'comparator' : manufacturer_comparator}
         ]
