@@ -43,7 +43,7 @@ training_file = 'products_training.json'
 # Here you need to define any custom comparison functions you may use for different fields
 
 def price_comparator(field_1, field_2) :
-    if field_1 and field_2 :
+    if field_1 and field_2 and field_1 != "0" and field_2 != "0":
         if (field_1 == field_2 or (field_1 in field_2 or field_2 in field_1)):
             return 1
         else:
@@ -172,7 +172,7 @@ else:
     # Here you will need to define the fields dedupe will pay attention to. You also need to define the comparator
     # to be used and specify any customComparators. Please read the dedupe manual for details
     fields = [
-        {'field' : 'title', 'type': 'string', 'has missing':False},
+        {'field' : 'title', 'type': 'string', 'has missing':True},
         {'field' : 'price', 'type': 'Custom', 'has missing':True, 'comparator' : price_comparator},
         {'field' : 'manufacturer', 'type': 'Custom', 'has missing':True, 'comparator' : manufacturer_comparator}
         ]
