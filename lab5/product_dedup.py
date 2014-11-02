@@ -104,30 +104,7 @@ def lev_comparator(field_1, field_2):
 
 def title_comparator(field_1, field_2) :
     if field_1 and field_2 :
-        if (field_1 == field_2 or field_1 in field_2 or field_2 in field_1):
-            return 100
-
-        field_1 = field_1.split()
-        field_2 = field_2.split()
-
-        if(len(field_1) < 2 and len(field_2) > 2):
-            return nan
-
-        if(len(field_2) < 2 and len(field_1) > 2):
-            return nan
-
-        f1_f2 = 0
-        f2_f1 = 0
-
-        for word in field_1:
-            if word in field_2:
-                f1_f2 += 1
-
-        for word in field_2:
-            if word in field_1:
-                f2_f1 += 1
-
-        return f1_f2 * f2_f1
+        return lev_comparator(field_1, field_2)
 
     else :
         return nan
@@ -195,7 +172,7 @@ else:
     # Here you will need to define the fields dedupe will pay attention to. You also need to define the comparator
     # to be used and specify any customComparators. Please read the dedupe manual for details
     fields = [
-        {'field' : 'title', 'type': 'Custom', 'has missing':True, 'comparator' : title_comparator},
+        {'field' : 'title', 'type': 'string', 'has missing':False},
         {'field' : 'price', 'type': 'Custom', 'has missing':True, 'comparator' : price_comparator},
         {'field' : 'manufacturer', 'type': 'Custom', 'has missing':True, 'comparator' : manufacturer_comparator}
         ]
