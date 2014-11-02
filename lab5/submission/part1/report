@@ -1,0 +1,8 @@
+Output from Evaluation script: 
+
+Precision: 0/4590 
+Recall: 3033/4590
+
+It seems that there was a great deal more recall errors than there were precision errors from my deduplication. 
+
+The fields I used for comparison were price, title, and manufacturer. The comparatorfor price extracted numbers and comapred those. The comparator for manufacturer checked for equality, and if a field is a substring of the other field. The title comparator I originally wrote was based off Levenstein string distance. 
