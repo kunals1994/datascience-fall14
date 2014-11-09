@@ -14,7 +14,7 @@ package org.myorg;
         public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
             private final static IntWritable one = new IntWritable(1);
             private Text curr = new Text();
-            private Text prev = null;
+            private Text prev = new Text();
 
             public void map(LongWritable key, Text value, OutputCollector output, Reporter reporter) throws IOException {
                 String line = value.toString();
@@ -22,7 +22,6 @@ package org.myorg;
                 while (tokenizer.hasMoreTokens()) {
                 	//First iteration, prev is not set. 
                 	if (prev == null){
-                		prev.set(curr); 
                 		curr.set(tokenizer.nextToken());
                 		continue;
                 	}
