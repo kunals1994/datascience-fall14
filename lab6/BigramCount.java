@@ -22,12 +22,12 @@ package org.myorg;
                 while (tokenizer.hasMoreTokens()) {
                 	//First iteration, prev is not set. 
                 	if (prev == null){
-                		prev = curr; 
+                		prev.set(curr); 
                 		curr.set(tokenizer.nextToken());
                 		continue;
                 	}
 
-                	prev = curr;
+                	prev.set(curr);
                     curr.set(tokenizer.nextToken());
                     output.collect(new Text(prev.toString() + " " + curr.toString()), one);
                 }
@@ -46,7 +46,7 @@ package org.myorg;
 
        	public static void jobOne(String [] args) throws Exception{
        		JobConf conf = new JobConf(BigramCount.class);
-	     	conf.setJobName("wordcount");
+	     	conf.setJobName("bigramcount-part1");
 	
 	     	conf.setOutputKeyClass(Text.class);
 	     	conf.setOutputValueClass(IntWritable.class);
