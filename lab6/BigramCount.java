@@ -44,8 +44,8 @@ package org.myorg;
             }
         }
 
-       	public static void jobOne(){
-       		JobConf conf = new JobConf(WordCount.class);
+       	public static void jobOne(String [] args){
+       		JobConf conf = new JobConf(BigramCount.class);
 	     	conf.setJobName("wordcount");
 	
 	     	conf.setOutputKeyClass(Text.class);
@@ -64,18 +64,26 @@ package org.myorg;
 	     	JobClient.runJob(conf);
        	}
 
-       	public static void jobTwo(){
+       	public static void jobTwo(String [] args){
 
        	}
 	
 	   	public static void main(String[] args) throws Exception {
-	    	if(args.length < 1){
-	    		System.out.println("Include job number");
+	    	if(args.length < 3){
+	    		System.err.println("Include job number and file input and output");
+	    		return;
 	    	}
-	    	else if (args[0].equals("1")){
-	    		jobOne();
+
+	    	String [] jobArgs = new String[2];
+	    	jobArgs[0] = args[1];
+	    	jobArgs[1] = args[2];
+
+
+
+	    	if (args[0].equals("1")){
+	    		jobOne(jobArgs);
 	    	}else if(args[0].equals("2")){
-	    		jobTwo();
+	    		jobTwo(jobArgs);
 	    	}
 
 	   	}
