@@ -96,7 +96,7 @@ package org.myorg;
                 	ret += s + '\t';
                 }
 
-                ret += "]"
+                ret += "]";
 
                 output.collect(key, new Text(ret));
             }
