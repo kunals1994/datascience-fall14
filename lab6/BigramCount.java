@@ -70,7 +70,7 @@ package org.myorg;
                     int currVal = Integer.parseInt(curr.substring(curr.indexOf("\t") + 1));
 
                     int index = -1;
-                    while(currVal >= topFiveValues[index + 1] && index < 4){
+                    while(index < 4 && currVal >= topFiveValues[index + 1]){
                     	index += 1;
                     }
 
