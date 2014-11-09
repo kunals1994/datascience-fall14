@@ -44,7 +44,7 @@ package org.myorg;
             }
         }
 
-       	public static void jobOne(String [] args){
+       	public static void jobOne(String [] args) throws Exception{
        		JobConf conf = new JobConf(BigramCount.class);
 	     	conf.setJobName("wordcount");
 	
@@ -64,7 +64,7 @@ package org.myorg;
 	     	JobClient.runJob(conf);
        	}
 
-       	public static void jobTwo(String [] args){
+       	public static void jobTwo(String [] args) throws Exception{
 
        	}
 	
