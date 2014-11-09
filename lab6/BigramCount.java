@@ -43,6 +43,67 @@ package org.myorg;
             }
         }
 
+
+        public static class MapTwo extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+
+            public void map(LongWritable key, Text value, OutputCollector output, Reporter reporter) throws IOException {
+                String line = value.toString();
+                int spaceOne = line.indexOf(" ");
+                int spaceTwo = line.indexOf("\t");
+
+                String one = line.substring(0, spaceOne);
+                String two = line.substring(spaceOne + 1, spaceTwo);
+
+                output.collect(one, value);
+                output.collect(two, value);
+            }
+        }
+	
+        public static class ReduceTwo extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
+            public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+                String [] topFive = new String[5];
+                int [] topFiveValues = new int [5];
+
+
+                while (values.hasNext()) {
+                    String curr = values.next().get().toString();
+                    int currVal = Integer.parseInt(curr.substring(curr.indexOf("\t") + 1));
+
+                    int index = -1;
+                    while(currVal >= topFiveValues[index + 1] && index < 4){
+                    	index += 1;
+                    }
+
+                    if(index == -1){
+                    	continue;
+                    }
+
+                    int temp = index; 
+                    while(temp > 0){
+                    	topFive[temp - 1] = topFive[temp];
+                    	topFiveValues[temp - 1] = topFiveValues[temp];
+
+                    	temp -=1;
+                    }
+
+                    topFive[index] = curr;
+                    topFiveValues[index] = currVal;
+
+                }
+
+                String ret = new String("[");
+                for (String s : topFive){
+                	ret += s + '\t';
+                }
+
+                ret += "]"
+
+                output.collect(key, new Text(ret));
+            }
+        }
+
+
+
        	public static void jobOne(String [] args) throws Exception{
        		JobConf conf = new JobConf(BigramCount.class);
 	     	conf.setJobName("bigramcount-part1");
@@ -64,7 +125,23 @@ package org.myorg;
        	}
 
        	public static void jobTwo(String [] args) throws Exception{
-
+       		JobConf conf = new JobConf(BigramCount.class);
+	     	conf.setJobName("bigramcount-part2");
+	
+	     	conf.setOutputKeyClass(Text.class);
+	     	conf.setOutputValueClass(Text.class);
+	
+	     	conf.setMapperClass(MapTwo.class);
+	     	conf.setCombinerClass(ReduceTwo.class);
+	     	conf.setReducerClass(ReduceTwo.class);
+	
+	     	conf.setInputFormat(TextInputFormat.class);
+	     	conf.setOutputFormat(TextOutputFormat.class);
+	
+	     	FileInputFormat.setInputPaths(conf, new Path(args[0]));
+	     	FileOutputFormat.setOutputPath(conf, new Path(args[1]));
+	
+	     	JobClient.runJob(conf);
        	}
 	
 	   	public static void main(String[] args) throws Exception {
