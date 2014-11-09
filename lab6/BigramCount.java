@@ -66,7 +66,7 @@ package org.myorg;
 
 
                 while (values.hasNext()) {
-                    String curr = values.next().get().toString();
+                    String curr = values.next().toString();
                     int currVal = Integer.parseInt(curr.substring(curr.indexOf("\t") + 1));
 
                     int index = -1;
