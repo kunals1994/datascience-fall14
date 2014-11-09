@@ -68,8 +68,8 @@ package org.myorg;
                 while (values.hasNext()) {
                     String curr = values.next().toString();
                     System.out.println(curr);
-                    return;
-                    int currVal = Integer.parseInt(curr.substring(curr.indexOf("\t") + 1));
+                }
+                    /**int currVal = Integer.parseInt(curr.substring(curr.indexOf("\t") + 1));
 
                     int index = -1;
                     while(index < 4 && currVal >= topFiveValues[index + 1]){
@@ -100,7 +100,7 @@ package org.myorg;
 
                 ret += "]";
 
-                output.collect(key, new Text(ret));
+                output.collect(key, new Text(ret));**/
             }
         }
 
