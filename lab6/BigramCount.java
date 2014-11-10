@@ -71,7 +71,7 @@ package org.myorg;
                     int end = curr.indexOf("\t");
 
                     while(curr.substring(start, end).equals("null")){
-                    	start = end;
+                    	start = end + 1;
                     	end = curr.indexOf("\t", start);
                     }
 
