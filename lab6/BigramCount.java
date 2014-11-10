@@ -54,8 +54,8 @@ package org.myorg;
                 String one = line.substring(0, spaceOne);
                 String two = line.substring(spaceOne + 1, spaceTwo);
 
-                output.collect(new Text(one), value);
-                output.collect(new Text(two), value);
+                output.collect(new Text(one), new Text(line));
+                output.collect(new Text(two), new Text(line));
             }
         }
 	
