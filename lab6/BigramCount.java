@@ -65,7 +65,7 @@ package org.myorg;
                 int [] topFiveValues = new int [5];
 
                 while (values.hasNext()) {
-                    String [] curr2 = values.next().toString().split('\t');
+                    String [] curr2 = values.next().toString().split("\t");
 
                     String curr = new String("");
                     boolean found = false;
