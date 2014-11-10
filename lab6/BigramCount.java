@@ -66,9 +66,8 @@ package org.myorg;
 
                 while (values.hasNext()) {
                     String curr = values.next().toString();
-                    System.out.println(curr);
 
-                    int start = 0;
+                    int start = 1;
                     int end = curr.indexOf("\t");
 
                     while(curr.substring(start, end).equals("null")){
