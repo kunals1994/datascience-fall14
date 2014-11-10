@@ -66,6 +66,7 @@ package org.myorg;
 
 
                 while (values.hasNext()) {
+                	System.out.println("In loop");
                     String curr = values.next().toString();
                     System.out.println(curr);
 
@@ -100,7 +101,7 @@ package org.myorg;
 
                 String ret = new String("[");
                 for (String s : topFive){
-                	ret += s + '\t';
+                	ret += s + ',\t';
                 }
 
                 ret += "]";
