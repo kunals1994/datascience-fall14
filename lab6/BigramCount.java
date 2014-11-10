@@ -44,9 +44,9 @@ package org.myorg;
         }
 
 
-        public static class MapTwo extends MapReduceBase implements Mapper<LongWritable, Text, Text, String> {
+        public static class MapTwo extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
-            public void map(LongWritable key, Text value, Context context) throws IOException {
+            public void map(LongWritable key, Text value, OutputCollector output, Reporter reporter) throws IOException {
                 String line = value.toString();
                 int spaceOne = line.indexOf(" ");
                 int spaceTwo = line.indexOf("\t");
@@ -54,20 +54,31 @@ package org.myorg;
                 String one = line.substring(0, spaceOne);
                 String two = line.substring(spaceOne + 1, spaceTwo);
 
-
-                context.write(new Text(one), line);
-                context.write(new Text(two), line);
+                output.collect(new Text(one), new Text(line));
+                output.collect(new Text(two), new Text(line));
             }
         }
 	
-        public static class ReduceTwo extends MapReduceBase implements Reducer<Text, String, Text, Text> {
-            public void reduce(Text key, Iterator<String> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+        public static class ReduceTwo extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
+            public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
                 String [] topFive = new String[5];
                 int [] topFiveValues = new int [5];
 
-
                 while (values.hasNext()) {
-                    String curr = values.next();
+                    String curr = values.next().toString();
+                    System.out.println(curr);
+
+                    int start = 0;
+                    int end = curr.indexOf("\t");
+
+                    while(curr.substring(start, end).equals("null")){
+                    	start = end;
+                    	end = curr.indexOf("\t", start);
+                    }
+
+                    end = curr.indexOf("\t", end);
+
+                    curr = curr.substring(start, end);
 
                     int currVal = 0;
                     try{
@@ -105,7 +116,7 @@ package org.myorg;
 
                 ret += "]";
 
-                output.collect(new Text(key), new Text(ret));
+                output.collect(key, new Text(ret));
             }
         }
 
@@ -125,8 +136,8 @@ package org.myorg;
 	     	conf.setInputFormat(TextInputFormat.class);
 	     	conf.setOutputFormat(TextOutputFormat.class);
 	
-	    	FileInputFormat.setInputPaths(conf, new Path(args[0]));
-	    	FileOutputFormat.setOutputPath(conf, new Path(args[1]));
+	     	FileInputFormat.setInputPaths(conf, new Path(args[0]));
+	     	FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 	
 	     	JobClient.runJob(conf);
        	}
