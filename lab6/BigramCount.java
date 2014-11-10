@@ -54,6 +54,7 @@ package org.myorg;
                 String one = line.substring(0, spaceOne);
                 String two = line.substring(spaceOne + 1, spaceTwo);
 
+                System.out.println(line);
                 output.collect(new Text(one), new Text(line));
                 output.collect(new Text(two), new Text(line));
             }
@@ -66,9 +67,7 @@ package org.myorg;
 
 
                 while (values.hasNext()) {
-                	System.out.println("In loop");
                     String curr = values.next().toString();
-                    System.out.println(curr);
 
                     int currVal = 0;
                     try{
