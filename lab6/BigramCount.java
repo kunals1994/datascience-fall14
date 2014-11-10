@@ -101,7 +101,7 @@ package org.myorg;
 
                 String ret = new String("[");
                 for (String s : topFive){
-                	ret += s + ',\t';
+                	ret += s + ",\t";
                 }
 
                 ret += "]";
