@@ -61,7 +61,7 @@ package org.myorg;
         }
 	
         public static class ReduceTwo extends MapReduceBase implements Reducer<Text, String, Text, Text> {
-            public void reduce(String key, Iterator<String> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+            public void reduce(Text key, Iterator<String> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
                 String [] topFive = new String[5];
                 int [] topFiveValues = new int [5];
 
@@ -125,8 +125,8 @@ package org.myorg;
 	     	conf.setInputFormat(TextInputFormat.class);
 	     	conf.setOutputFormat(TextOutputFormat.class);
 	
-	     	FileInputFormat.setInputPaths(conf, new Path(args[0]));
-	     	FileOutputFormat.setOutputPath(conf, new Path(args[1]));
+	    	FileInputFormat.setInputPaths(conf, new Path(args[0]));
+	    	FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 	
 	     	JobClient.runJob(conf);
        	}
