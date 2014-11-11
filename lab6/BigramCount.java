@@ -77,7 +77,7 @@ package org.myorg;
                     Pattern pat = Pattern.compile("[a-zA-Z]+ [a-zA-Z]+\t[0-9]+");
                     Matcher mat = pat.matcher(curr);
 
-                    if(!matcher.find()){
+                    if(!mat.find()){
                         continue;
                     }
 
