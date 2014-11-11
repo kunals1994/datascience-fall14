@@ -59,7 +59,7 @@ package org.myorg;
             }
         }
 	
-        public static class ReduceTwo extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
+        public static class ReduceTwo extends MapReduceBase implements Reducer<Text, String, Text, Text> {
             public void reduce(Text key, Iterator<String> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
                 String [] topFive = new String[5];
                 int [] topFiveValues = new int [5];
