@@ -44,7 +44,7 @@ package org.myorg;
         }
 
 
-        public static class MapTwo extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+        public static class MapTwo extends MapReduceBase implements Mapper<LongWritable, Text, Text, String> {
 
             public void map(LongWritable key, Text value, OutputCollector output, Reporter reporter) throws IOException {
                 String line = value.toString();
@@ -60,27 +60,12 @@ package org.myorg;
         }
 	
         public static class ReduceTwo extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
-            public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+            public void reduce(Text key, Iterator<String> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
                 String [] topFive = new String[5];
                 int [] topFiveValues = new int [5];
 
                 while (values.hasNext()) {
-                    String curr2 = values.next().toString();
-
-                    int start = 1;
-                    int end = curr2.indexOf("\t", start);
-                    String curr = curr2.substring(start, end);
-                    while(curr.equals("null")){
-                        start = end + 1;
-                        end = curr2.indexOf("\t", start);
-                        curr = curr2.substring(start, end);
-                    }
-
-                    end = curr2.indexOf("\t", end + 1);
-                    if(end < 0 || start < 0){
-                        continue;
-                    }
-                    curr = curr2.substring(start, end);
+                    String curr = values.next();
 
                     int currVal = 0;
                     try{
