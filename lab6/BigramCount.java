@@ -44,7 +44,8 @@ package org.myorg;
         }
 
 
-        public static class MapTwo extends MapReduceBase implements Mapper<LongWritable, Text, Text, String> {
+        public static class MapTwo extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+            private Text out = new Text();
 
             public void map(LongWritable key, Text value, OutputCollector output, Reporter reporter) throws IOException {
                 String line = value.toString();
@@ -54,13 +55,15 @@ package org.myorg;
                 String one = line.substring(0, spaceOne);
                 String two = line.substring(spaceOne + 1, spaceTwo);
 
-                output.collect(new Text(one), new Text(line));
-                output.collect(new Text(two), new Text(line));
+                out.set(line);
+
+                output.collect(new Text(one), out);
+                output.collect(new Text(two), out);
             }
         }
 	
-        public static class ReduceTwo extends MapReduceBase implements Reducer<Text, String, Text, Text> {
-            public void reduce(Text key, Iterator<String> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+        public static class ReduceTwo extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
+            public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
                 String [] topFive = new String[5];
                 int [] topFiveValues = new int [5];
 
