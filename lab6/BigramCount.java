@@ -57,7 +57,6 @@ package org.myorg;
 				String two = line.substring(spaceOne + 1, spaceTwo);
 
 				out.set(line);
-				System.out.println(out.toString());
 
 				output.collect(new Text(one), out);
 				output.collect(new Text(two), out);
