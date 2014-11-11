@@ -46,7 +46,7 @@ package org.myorg;
 
         public static class MapTwo extends MapReduceBase implements Mapper<LongWritable, Text, Text, String> {
 
-            public void map(LongWritable key, Text value, Context context) throws IOException {
+            public void map(LongWritable key, Text value, OutputCollector<Text,String> output, Reporter reporter) throws IOException {
                 String line = value.toString();
                 int spaceOne = line.indexOf(" ");
                 int spaceTwo = line.indexOf("\t");
@@ -54,8 +54,8 @@ package org.myorg;
                 String one = line.substring(0, spaceOne);
                 String two = line.substring(spaceOne + 1, spaceTwo);
 
-                context.write(new Text(one), line);
-                context.write(new Text(two), line);
+                output.collect(new Text(one), line);
+                output.collect(new Text(two), line);
             }
         }
 	
