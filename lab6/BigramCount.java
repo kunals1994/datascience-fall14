@@ -77,6 +77,9 @@ package org.myorg;
                     }
 
                     end = curr2.indexOf("\t", end + 1);
+                    if(end < 0 || start < 0){
+                        continue;
+                    }
                     curr = curr2.substring(start, end);
 
                     int currVal = 0;
