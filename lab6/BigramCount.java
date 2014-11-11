@@ -2,6 +2,7 @@ package org.myorg;
 
 	import java.io.IOException;
 	import java.util.*;
+    import java.util.regex.*;
 	
 	import org.apache.hadoop.fs.Path;
 	import org.apache.hadoop.conf.*;
@@ -71,6 +72,16 @@ package org.myorg;
                 while (values.hasNext()) {
                     String curr = values.next().toString();
 
+
+                    //For some reason Text objects were being converted to some weird format on my hadoop install; Parsing to a proper string below. 
+                    Pattern pat = Pattern.compile("[a-zA-Z]* [a-zA-Z]*\t\d*");
+                    Matcher mat = pat.matcher(curr);
+
+                    if(!matcher.find()){
+                        continue;
+                    }
+
+                    curr = mat.group(1);
 
                     int currVal = 0;
                     try{
