@@ -65,22 +65,19 @@ package org.myorg;
                 int [] topFiveValues = new int [5];
 
                 while (values.hasNext()) {
-                    String [] curr2 = values.next().toString().split("\t");
+                    String curr2 = values.next().toString();
 
-                    String curr = new String("");
-                    boolean found = false;
-                    for (String s: curr2){
-                    	if(!s.equals("null")){
-                    		
-                    		if(found){
-                    			curr += s + '\t';
-                    			break;
-                    		}else{
-                    			curr += s;
-                    			found = true;
-                    		}
-                    	}
+                    int start = 1;
+                    int end = curr2.indexOf("\t", start);
+                    String curr = curr2.substring(start, end);
+                    while(curr.equals("null")){
+                        start = end + 1;
+                        end = curr2.indexOf("\t", start);
+                        curr = curr2.substring(start, end);
                     }
+
+                    end = curr2.indexOf("\t", end + 1);
+                    curr = curr2.substring(start, end);
 
                     int currVal = 0;
                     try{
