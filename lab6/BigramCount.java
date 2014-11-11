@@ -65,7 +65,8 @@ package org.myorg;
                 int [] topFiveValues = new int [5];
 
                 while (values.hasNext()) {
-                    String curr = values.next();
+                    String curr = values.next().toString();
+                    System.out.println(curr);
 
                     int currVal = 0;
                     try{
