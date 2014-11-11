@@ -56,6 +56,7 @@ package org.myorg;
                 String two = line.substring(spaceOne + 1, spaceTwo);
 
                 out.set(line);
+                System.out.println(out.toString());
 
                 output.collect(new Text(one), out);
                 output.collect(new Text(two), out);
@@ -69,7 +70,7 @@ package org.myorg;
 
                 while (values.hasNext()) {
                     String curr = values.next().toString();
-                    System.out.println(curr);
+
 
                     int currVal = 0;
                     try{
