@@ -74,7 +74,7 @@ package org.myorg;
 
 
                     //For some reason Text objects were being converted to some weird format on my hadoop install; Parsing to a proper string below. 
-                    Pattern pat = Pattern.compile("[a-zA-Z]* [a-zA-Z]*\t\d*");
+                    Pattern pat = Pattern.compile("[a-zA-Z]+ [a-zA-Z]+\t[0-9]+");
                     Matcher mat = pat.matcher(curr);
 
                     if(!matcher.find()){
