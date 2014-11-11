@@ -74,11 +74,11 @@ package org.myorg;
 
 
 					//For some reason Text objects were being converted to some weird format on my hadoop install; Parsing to a proper string below. 
-					Pattern pat = Pattern.compile("[a-z]+ [a-z]+	[0-9]+");
+					Pattern pat = Pattern.compile("[a-z]+ [a-z]+\t[0-9]+");
 					Matcher mat = pat.matcher(curr);
-					
+
 					if(mat.find()){
-						curr = mat.group(1);
+						curr = mat.group(0);
 					}else{
 						continue;
 					}
