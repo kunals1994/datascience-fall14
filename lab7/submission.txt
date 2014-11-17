@@ -1,10 +1,216 @@
 ===================== Cassandra: CQL Queries and Results
+SCHEMA: 
+
+CREATE TABLE clicksImpressions (
+    OwnerId int,
+    AdId int,
+    numClicks int,
+    numImpressions int,
+    PRIMARY KEY (OwnerId, AdId)
+);
+
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (1,1,1,10);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (1,2,0,5);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (1,3,1,20);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (1,4,0,15);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (2,1,0,10);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (2,2,0,55);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (2,3,0,13);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (2,4,0,21);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (3,1,1,32);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (3,2,0,23);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (3,3,2,44);
+INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (3,4,1,36);
 
 
+1. 
+
+	Query: 
+		select OwnerId,AdId,numClicks 
+		from clicksImpressions 
+		WHERE OwnerId=1 AND AdId=3;
+
+	Result: 
+		
+		 ownerid | adid | numclicks
+		---------+------+-----------
+		       1 |    3 |         1
+
+
+
+2. 
+
+	Query: 
+		select OwnerId,AdId,numClicks 
+		from clicksImpressions 
+		WHERE OwnerId=2;
+
+	Result: 
+		 ownerid | adid | numclicks
+		---------+------+-----------
+		       2 |    1 |         0
+		       2 |    2 |         0
+		       2 |    3 |         0
+		       2 |    4 |         0
 
 
 
 ===================== Cassandra: Python Code
+
+
+import logging
+
+log = logging.getLogger()
+#log.setLevel('DEBUG')
+log.setLevel('WARN')
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+log.addHandler(handler)
+
+from cassandra import ConsistencyLevel
+from cassandra.cluster import Cluster
+from cassandra.query import SimpleStatement
+
+KEYSPACE = "parttwospace"
+
+def main():
+    cluster = Cluster(['127.0.0.1'])
+    session = cluster.connect()
+
+    log.info("creating keyspace...")
+    session.execute("""
+        CREATE KEYSPACE IF NOT EXISTS %s
+        WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '2' }
+        """ % KEYSPACE)
+
+    log.info("setting keyspace...")
+    session.set_keyspace(KEYSPACE)
+
+    log.info("creating table...")
+    
+    session.execute("""
+        CREATE TABLE IF NOT EXISTS clicksImpressions (
+            OwnerId int,
+            AdId int,
+            numClicks int,
+            numImpressions int,
+            PRIMARY KEY (OwnerId, AdId)
+        )""")
+
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (1,1,1,10)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (1,2,0,5)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (1,3,1,20)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (1,4,0,15)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (2,1,0,10)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (2,2,0,55)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (2,3,0,13)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (2,4,0,21)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (3,1,1,32)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (3,2,0,23)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (3,3,2,44)")
+    session.execute("INSERT INTO clicksImpressions (OwnerId, AdId, numClicks, numImpressions) VALUES (3,4,1,36)")
+
+
+    print "\n\nFirst Query\n\n"
+
+    query = """ SELECT OwnerId,AdId,numClicks,numImpressions
+                FROM clicksImpressions
+                """
+
+    future = session.execute_async(query)
+    try:
+        rows = future.result()
+        print_ctr_results(rows)
+        print "\n\n"
+    except Exception:
+        print "First Query failed"
+        log.exception(Exception)
+
+
+    print "Second Query\n\n"
+
+    query = """ SELECT OwnerId,numClicks,numImpressions
+        FROM clicksImpressions
+        """
+
+    future = session.execute_async(query)
+
+    try:
+        rows = future.result()
+        owner_mapping = {}
+        for row in rows:
+            if row[0] not in  owner_mapping:
+                owner_mapping[row[0]] = [row[1],row[2]]
+            else:
+                owner_mapping[row[0]][0] += row[1]
+                owner_mapping[row[0]][1] += row[2]
+
+        print "OwnerId\tAdId\tctr"
+        for key in owner_mapping: 
+            print "%d\t%f" % (key, float(owner_mapping[key][0])/float(owner_mapping[key][1]))
+
+        print "\n\n"
+    except Exception:
+        print "Query 2 Failed"
+        log.exception(Exception)
+
+
+    print "Third Query\n\n"
+
+    query = """ SELECT OwnerId,AdId,numClicks,numImpressions
+                FROM clicksImpressions
+                WHERE OwnerId = 1 AND AdId = 3
+                """
+
+    future = session.execute_async(query)
+    try:
+        rows = future.result()
+        print_ctr_results(rows)
+        print "\n\n"
+    except Exception:
+        print "Third Query failed"
+        log.exception(Exception)
+
+
+
+    print "Fourth Query\n\n"
+
+    query = """ SELECT OwnerId,numClicks,numImpressions
+                FROM clicksImpressions
+                WHERE OwnerId = 2
+                """
+
+    future = session.execute_async(query)
+    try:
+        rows = future.result()
+        clicks = 0
+        impressions = 0
+        for row in rows:
+            clicks += row[1]
+            impressions += row[2]
+
+        print "ctr for OwnerId 2 = %f\n" % (float(clicks)/float(impressions))
+
+
+    except Exception:
+        print "Fourth Query failed"
+        log.exception(Exception)
+
+
+def print_ctr_results(rows):
+    log.info("key\tcol1\tcol2")
+    log.info("---\t----\t----")
+
+
+    print "OwnerID\tAdId\tctr"
+
+    for row in rows:
+        print "%d\t%d\t%f" % (row[0],row[1],float(row[2])/float(row[3]))
+        log.info('\t'.join(str(row))) 
+
+
+if __name__ == "__main__":
+    main()
 
 
 
@@ -16,9 +222,729 @@
 
 
 
+First Query
+
+
+OwnerID	AdId	ctr
+1	1	0.100000
+1	2	0.000000
+1	3	0.050000
+1	4	0.000000
+2	1	0.000000
+2	2	0.000000
+2	3	0.000000
+2	4	0.000000
+3	1	0.031250
+3	2	0.000000
+3	3	0.045455
+3	4	0.027778
+
+
+
+Second Query
+
+
+OwnerId	AdId	ctr
+1	0.040000
+2	0.000000
+3	0.029630
+
+
+
+Third Query
+
+
+OwnerID	AdId	ctr
+1	3	0.050000
+
+
+
+Fourth Query
+
+
+ctr for OwnerId 2 = 0.000000
+
+
 
 ===================== MongoDB Queries and Outputs
 
+Import: 
+	mongoimport --db parttwodb --collection json< zipData.json 
+	
+	Output: 
+		connected to: 127.0.0.1
+		Thu Nov 13 18:40:05.004 			5100	1700/second
+		Thu Nov 13 18:40:08.000 			18200	3033/second
+		Thu Nov 13 18:40:10.571 check 9 29352
+		Thu Nov 13 18:40:10.571 imported 29352 objects
 
 
 
+Insert: 
+
+	> doc  =  { "_id" : "99950", "city" : "KETCHIKAN", "loc" : [ -133.18479, 55.942471 ], "pop" : 422, "state" : "AK" }
+	> db.json.insert(doc)
+
+
+
+Return cities with population less than 5 million grouped by state.
+	
+Query:
+	db.json.aggregate({$group: {_id:{state: "$state", city: "$city"},pop : {$sum: "$pop"}}}, {$match: {pop: {"$lt": 5000000}}}, {$group: {_id: "$_id.state", cities: {"$push":"$_id.city"}}})
+
+Result: 
+    The result is over a thousand lines long; pasting it into this document causes vim to crash. 
+
+
+
+Return states sorted by their total city population.
+
+Query:
+
+	db.json.aggregate({$group: {_id:{state: "$state"},pop : {$sum: "$pop"}}}, {$sort: {pop: -1}})
+
+
+Result: 
+
+
+{
+	"result" : [
+		{
+			"_id" : {
+				"state" : "CA"
+			},
+			"pop" : 29754890
+		},
+		{
+			"_id" : {
+				"state" : "NY"
+			},
+			"pop" : 17990402
+		},
+		{
+			"_id" : {
+				"state" : "TX"
+			},
+			"pop" : 16984601
+		},
+		{
+			"_id" : {
+				"state" : "FL"
+			},
+			"pop" : 12686644
+		},
+		{
+			"_id" : {
+				"state" : "PA"
+			},
+			"pop" : 11881643
+		},
+		{
+			"_id" : {
+				"state" : "IL"
+			},
+			"pop" : 11427576
+		},
+		{
+			"_id" : {
+				"state" : "OH"
+			},
+			"pop" : 10846517
+		},
+		{
+			"_id" : {
+				"state" : "MI"
+			},
+			"pop" : 9295297
+		},
+		{
+			"_id" : {
+				"state" : "NJ"
+			},
+			"pop" : 7730188
+		},
+		{
+			"_id" : {
+				"state" : "NC"
+			},
+			"pop" : 6628637
+		},
+		{
+			"_id" : {
+				"state" : "GA"
+			},
+			"pop" : 6478216
+		},
+		{
+			"_id" : {
+				"state" : "VA"
+			},
+			"pop" : 6181479
+		},
+		{
+			"_id" : {
+				"state" : "MA"
+			},
+			"pop" : 6016425
+		},
+		{
+			"_id" : {
+				"state" : "IN"
+			},
+			"pop" : 5544136
+		},
+		{
+			"_id" : {
+				"state" : "MO"
+			},
+			"pop" : 5110648
+		},
+		{
+			"_id" : {
+				"state" : "WI"
+			},
+			"pop" : 4891769
+		},
+		{
+			"_id" : {
+				"state" : "TN"
+			},
+			"pop" : 4876457
+		},
+		{
+			"_id" : {
+				"state" : "WA"
+			},
+			"pop" : 4866692
+		},
+		{
+			"_id" : {
+				"state" : "MD"
+			},
+			"pop" : 4781379
+		},
+		{
+			"_id" : {
+				"state" : "MN"
+			},
+			"pop" : 4372982
+		},
+		{
+			"_id" : {
+				"state" : "LA"
+			},
+			"pop" : 4217595
+		},
+		{
+			"_id" : {
+				"state" : "AL"
+			},
+			"pop" : 4040587
+		},
+		{
+			"_id" : {
+				"state" : "KY"
+			},
+			"pop" : 3675484
+		},
+		{
+			"_id" : {
+				"state" : "AZ"
+			},
+			"pop" : 3665228
+		},
+		{
+			"_id" : {
+				"state" : "SC"
+			},
+			"pop" : 3486703
+		},
+		{
+			"_id" : {
+				"state" : "CO"
+			},
+			"pop" : 3293755
+		},
+		{
+			"_id" : {
+				"state" : "CT"
+			},
+			"pop" : 3287116
+		},
+		{
+			"_id" : {
+				"state" : "OK"
+			},
+			"pop" : 3145585
+		},
+		{
+			"_id" : {
+				"state" : "OR"
+			},
+			"pop" : 2842321
+		},
+		{
+			"_id" : {
+				"state" : "IA"
+			},
+			"pop" : 2776420
+		},
+		{
+			"_id" : {
+				"state" : "MS"
+			},
+			"pop" : 2573216
+		},
+		{
+			"_id" : {
+				"state" : "KS"
+			},
+			"pop" : 2475285
+		},
+		{
+			"_id" : {
+				"state" : "AR"
+			},
+			"pop" : 2350725
+		},
+		{
+			"_id" : {
+				"state" : "WV"
+			},
+			"pop" : 1793146
+		},
+		{
+			"_id" : {
+				"state" : "UT"
+			},
+			"pop" : 1722850
+		},
+		{
+			"_id" : {
+				"state" : "NE"
+			},
+			"pop" : 1578139
+		},
+		{
+			"_id" : {
+				"state" : "NM"
+			},
+			"pop" : 1515069
+		},
+		{
+			"_id" : {
+				"state" : "ME"
+			},
+			"pop" : 1226648
+		},
+		{
+			"_id" : {
+				"state" : "NV"
+			},
+			"pop" : 1201833
+		},
+		{
+			"_id" : {
+				"state" : "NH"
+			},
+			"pop" : 1109252
+		},
+		{
+			"_id" : {
+				"state" : "HI"
+			},
+			"pop" : 1108229
+		},
+		{
+			"_id" : {
+				"state" : "ID"
+			},
+			"pop" : 1006749
+		},
+		{
+			"_id" : {
+				"state" : "RI"
+			},
+			"pop" : 1003218
+		},
+		{
+			"_id" : {
+				"state" : "MT"
+			},
+			"pop" : 798948
+		},
+		{
+			"_id" : {
+				"state" : "SD"
+			},
+			"pop" : 695397
+		},
+		{
+			"_id" : {
+				"state" : "DE"
+			},
+			"pop" : 666168
+		},
+		{
+			"_id" : {
+				"state" : "ND"
+			},
+			"pop" : 638272
+		},
+		{
+			"_id" : {
+				"state" : "DC"
+			},
+			"pop" : 606900
+		},
+		{
+			"_id" : {
+				"state" : "VT"
+			},
+			"pop" : 562758
+		},
+		{
+			"_id" : {
+				"state" : "AK"
+			},
+			"pop" : 544698
+		},
+		{
+			"_id" : {
+				"state" : "WY"
+			},
+			"pop" : 453528
+		}
+	],
+	"ok" : 1
+}
+
+
+
+Return the cities with minimum population by state.
+
+Query:
+	db.json.group({key: { state: 1}, reduce: function ( curr, result ) { if(curr.pop < result.pop){result.pop = curr.pop; result.city = curr.city;}}, initial: {city: "", pop: 1000000000 }})
+
+Result: 
+	[
+	{
+		"state" : "MA",
+		"city" : "CAMBRIDGE",
+		"pop" : 0
+	},
+	{
+		"state" : "RI",
+		"city" : "CLAYVILLE",
+		"pop" : 45
+	},
+	{
+		"state" : "NH",
+		"city" : "WEST NOTTINGHAM",
+		"pop" : 27
+	},
+	{
+		"state" : "ME",
+		"city" : "BUSTINS ISLAND",
+		"pop" : 0
+	},
+	{
+		"state" : "VT",
+		"city" : "UNIV OF VERMONT",
+		"pop" : 0
+	},
+	{
+		"state" : "CT",
+		"city" : "EAST KILLINGLY",
+		"pop" : 25
+	},
+	{
+		"state" : "NY",
+		"city" : "CHILDWOLD",
+		"pop" : 0
+	},
+	{
+		"state" : "NJ",
+		"city" : "IMLAYSTOWN",
+		"pop" : 17
+	},
+	{
+		"state" : "PA",
+		"city" : "HAMILTON",
+		"pop" : 0
+	},
+	{
+		"state" : "DE",
+		"city" : "BETHEL",
+		"pop" : 108
+	},
+	{
+		"state" : "DC",
+		"city" : "WASHINGTON",
+		"pop" : 11
+	},
+	{
+		"state" : "MD",
+		"city" : "BALTIMORE",
+		"pop" : 1
+	},
+	{
+		"state" : "VA",
+		"city" : "WALLOPS ISLAND",
+		"pop" : 0
+	},
+	{
+		"state" : "WV",
+		"city" : "MOUNT CARBON",
+		"pop" : 0
+	},
+	{
+		"state" : "NC",
+		"city" : "GLOUCESTER",
+		"pop" : 0
+	},
+	{
+		"state" : "SC",
+		"city" : "QUINBY",
+		"pop" : 0
+	},
+	{
+		"state" : "GA",
+		"city" : "ATLANTA",
+		"pop" : 0
+	},
+	{
+		"state" : "FL",
+		"city" : "CECIL FIELD NAS",
+		"pop" : 0
+	},
+	{
+		"state" : "AL",
+		"city" : "ALLEN",
+		"pop" : 0
+	},
+	{
+		"state" : "TN",
+		"city" : "MEMPHIS",
+		"pop" : 2
+	},
+	{
+		"state" : "MS",
+		"city" : "JACKSON",
+		"pop" : 0
+	},
+	{
+		"state" : "KY",
+		"city" : "BIG LAUREL",
+		"pop" : 0
+	},
+	{
+		"state" : "OH",
+		"city" : "ISLE SAINT GEORG",
+		"pop" : 38
+	},
+	{
+		"state" : "IN",
+		"city" : "NORA",
+		"pop" : 75
+	},
+	{
+		"state" : "MI",
+		"city" : "ANN ARBOR",
+		"pop" : 0
+	},
+	{
+		"state" : "IA",
+		"city" : "SIOUX CITY",
+		"pop" : 12
+	},
+	{
+		"state" : "WI",
+		"city" : "CLAM LAKE",
+		"pop" : 2
+	},
+	{
+		"state" : "MN",
+		"city" : "MINNEAPOLIS",
+		"pop" : 0
+	},
+	{
+		"state" : "SD",
+		"city" : "ZEONA",
+		"pop" : 8
+	},
+	{
+		"state" : "ND",
+		"city" : "TROTTERS",
+		"pop" : 12
+	},
+	{
+		"state" : "MT",
+		"city" : "MOSBY",
+		"pop" : 7
+	},
+	{
+		"state" : "IL",
+		"city" : "CHICAGO",
+		"pop" : 0
+	},
+	{
+		"state" : "MO",
+		"city" : "BRIDGETON",
+		"pop" : 0
+	},
+	{
+		"state" : "KS",
+		"city" : "KANSAS CITY",
+		"pop" : 0
+	},
+	{
+		"state" : "NE",
+		"city" : "LAKESIDE",
+		"pop" : 5
+	},
+	{
+		"state" : "LA",
+		"city" : "LAFITTE",
+		"pop" : 0
+	},
+	{
+		"state" : "AR",
+		"city" : "TOMATO",
+		"pop" : 0
+	},
+	{
+		"state" : "OK",
+		"city" : "SOUTHARD",
+		"pop" : 8
+	},
+	{
+		"state" : "TX",
+		"city" : "HOUSTON",
+		"pop" : 0
+	},
+	{
+		"state" : "CO",
+		"city" : "CHEYENNE MTN AFB",
+		"pop" : 0
+	},
+	{
+		"state" : "WY",
+		"city" : "LOST SPRINGS",
+		"pop" : 6
+	},
+	{
+		"state" : "ID",
+		"city" : "KEUTERVILLE",
+		"pop" : 0
+	},
+	{
+		"state" : "UT",
+		"city" : "MODENA",
+		"pop" : 9
+	},
+	{
+		"state" : "AZ",
+		"city" : "HUALAPAI",
+		"pop" : 2
+	},
+	{
+		"state" : "NM",
+		"city" : "ALGODONES",
+		"pop" : 0
+	},
+	{
+		"state" : "NV",
+		"city" : "TUSCARORA",
+		"pop" : 1
+	},
+	{
+		"state" : "CA",
+		"city" : "TORRANCE",
+		"pop" : 0
+	},
+	{
+		"state" : "HI",
+		"city" : "NINOLE",
+		"pop" : 0
+	},
+	{
+		"state" : "OR",
+		"city" : "KENT",
+		"pop" : 0
+	},
+	{
+		"state" : "WA",
+		"city" : "BENGE",
+		"pop" : 2
+	},
+	{
+		"state" : "AK",
+		"city" : "CHEVAK",
+		"pop" : 0
+	}
+]
+
+
+
+	MapReduce Query: 
+		db.json.mapReduce(function(){emit(this.state, this.pop);},function(key,values){return Array.sum(values)/values.length;}, {out:"average_pop"})
+
+
+	MapReduce Result:
+		>db.average_pop.find()
+{ "_id" : "AK", "value" : 1621.0776494316099 }
+{ "_id" : "AL", "value" : 6604.685668130592 }
+{ "_id" : "AR", "value" : 17500.826721704307 }
+{ "_id" : "AZ", "value" : 6185.8376294807695 }
+{ "_id" : "CA", "value" : 5014.419895507914 }
+{ "_id" : "CO", "value" : 3794.961518103799 }
+{ "_id" : "CT", "value" : 13052.604281719165 }
+{ "_id" : "DC", "value" : 25287.5 }
+{ "_id" : "DE", "value" : 6602.386111111111 }
+{ "_id" : "FL", "value" : 10550.253797453464 }
+{ "_id" : "GA", "value" : 8337.455969617935 }
+{ "_id" : "HI", "value" : 13852.8625 }
+{ "_id" : "IA", "value" : 6096.249782249409 }
+{ "_id" : "ID", "value" : 3725.1594358396237 }
+{ "_id" : "IL", "value" : 1416.5168669156944 }
+{ "_id" : "IN", "value" : 3053.8261303566273 }
+{ "_id" : "KS", "value" : 2213.4112286216487 }
+{ "_id" : "KY", "value" : 3517.082908698895 }
+{ "_id" : "LA", "value" : 3673.1212744438317 }
+{ "_id" : "MA", "value" : 9098.16854810248 }
+Type "it" for more
+> it
+{ "_id" : "MD", "value" : 5066.822515039222 }
+{ "_id" : "ME", "value" : 2433.1253772972177 }
+{ "_id" : "MI", "value" : 1645.942246243009 }
+{ "_id" : "MN", "value" : 1428.7520950817602 }
+{ "_id" : "MO", "value" : 5102.039132812917 }
+{ "_id" : "MS", "value" : 5804.426787527083 }
+{ "_id" : "MT", "value" : 3876.5973615118724 }
+{ "_id" : "NC", "value" : 7157.774679963953 }
+{ "_id" : "ND", "value" : 999.6416525355174 }
+{ "_id" : "NE", "value" : 2049.655486397137 }
+{ "_id" : "NH", "value" : 4444.654204979071 }
+{ "_id" : "NJ", "value" : 18275.35019517836 }
+{ "_id" : "NM", "value" : 3604.6861363366083 }
+{ "_id" : "NV", "value" : 11814.46105263158 }
+{ "_id" : "NY", "value" : 3573.5056626978594 }
+{ "_id" : "OH", "value" : 5918.86061173686 }
+{ "_id" : "OK", "value" : 4057.2797224904702 }
+{ "_id" : "OR", "value" : 2523.5313602089745 }
+{ "_id" : "PA", "value" : 12061.784612757692 }
+{ "_id" : "RI", "value" : 17771.147727272728 }
+Type "it" for more
+> it
+{ "_id" : "SC", "value" : 8134.4155647795105 }
+{ "_id" : "SD", "value" : 1455.3905981126259 }
+{ "_id" : "TN", "value" : 4165.247522780719 }
+{ "_id" : "TX", "value" : 15275.601456552007 }
+{ "_id" : "UT", "value" : 3275.9934714782958 }
+{ "_id" : "VA", "value" : 5260.91391472198 }
+{ "_id" : "VT", "value" : 741.5051456528378 }
+{ "_id" : "WA", "value" : 9744.63954493797 }
+{ "_id" : "WI", "value" : 7762.805372010174 }
+{ "_id" : "WV", "value" : 1360.3025167703204 }
+{ "_id" : "WY", "value" : 3282.6287037037036 }	
