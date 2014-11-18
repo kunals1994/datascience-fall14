@@ -36,6 +36,9 @@ import org.umd.assignment.spout.TwitterSampleSpout;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.*;
 
 /**
  * This topology demonstrates Storm's stream groupings and multilang capabilities.
@@ -59,7 +62,19 @@ public class WordCountTopology {
   }
 
   public static class WordCount extends BaseBasicBolt {
-    Map<String, Integer> counts = new HashMap<String, Integer>();
+    Map<String, Integer> counts;
+    ArrayList<String> skipWords;
+
+    public WordCount() throws Exception{
+    	counts = new HashMap<String, Integer>();
+    	skipWords = new ArrayList<String>();
+    	Scanner fileIn = new Scanner(new File("../Stopwords.txt"));
+
+    	while(fileIn.hasNextLine()){
+    		skipWords.add(fileIn.nextLine());
+    	}
+
+    }
 
     @Override
     public void execute(Tuple tuple, BasicOutputCollector collector) {
@@ -75,6 +90,11 @@ public class WordCountTopology {
 
 
 		String word = tuple.getString(0);
+
+		if(skipWords.contains(word)){
+			return;
+		}
+
 		Integer count = counts.get(word);
 		if (count == null)
 			count = 0;
@@ -88,6 +108,9 @@ public class WordCountTopology {
 	@Override
 	public void cleanup()
 	{
+		for(String curr: counts.keySet()){
+			System.out.println("Count Output " + curr + '\t' + counts.get(curr));
+		}
 		// ------------------------  Task 3 ---------------------------------------
 		//
 		//
@@ -124,7 +147,7 @@ public class WordCountTopology {
 	//--------------------------------------------------------------------------
 
 	// Setting up a spout
-    builder.setSpout("spout", new RandomSentenceSpout(), 3); //builder.setSpout("spout", new TwitterSampleSpout(), 3);
+    builder.setSpout("spout", new TwitterSampleSpout(), 3);
 
 	// Setting up bolts
     builder.setBolt("split", new SplitSentence(), 3).shuffleGrouping("spout");
@@ -153,7 +176,7 @@ public class WordCountTopology {
 	  //
 	  // ----------------------------------------------------------------------
 
-      Thread.sleep(10000);
+      Thread.sleep(10000 * 60);
 
       cluster.shutdown(); // blot "cleanup" function is called when cluster is shutdown (only works in local mode)
     }
